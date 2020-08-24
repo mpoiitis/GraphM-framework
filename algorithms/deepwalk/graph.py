@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from time import time
-import logging
 import random
 import networkx as nx
 
-logger = logging.getLogger("deepwalk")
 
 def random_walk(G, path_length, alpha=0, rand=random.Random(), start=None):
     """ Returns a truncated random walk.
@@ -22,7 +20,7 @@ def random_walk(G, path_length, alpha=0, rand=random.Random(), start=None):
 
     while len(path) < path_length:
       current = path[-1]
-      neighbors = G.neighbors(current)
+      neighbors = list(G.neighbors(current))
       if len(neighbors) > 0:
         if rand.random() >= alpha:
           path.append(rand.choice(neighbors))
@@ -42,7 +40,7 @@ def build_deepwalk_corpus(G, num_paths, path_length, alpha=0,
     for cnt in range(num_paths):
         rand.shuffle(nodes)
         for node in nodes:
-            walks.append(G.random_walk(path_length, rand=rand, alpha=alpha, start=node))
+            walks.append(random_walk(G, path_length, rand=rand, alpha=alpha, start=node))
 
     return walks
 
@@ -58,12 +56,12 @@ def load_adjacencylist(file, undirected=False):
         t0 = time()
         G = nx.read_adjlist(file)
         t1 = time()
-        logger.info('Undirected graph loaded in {}s'.format(t1 - t0))
+        print('Undirected graph loaded in {}s'.format(t1 - t0))
     else:
         t0 = time()
         G = nx.read_adjlist(file, create_using=nx.DiGraph())
         t1 = time()
-        logger.info('Directed graph loaded in {}s'.format(t1 - t0))
+        print('Directed graph loaded in {}s'.format(t1 - t0))
 
     return G
 
@@ -79,11 +77,12 @@ def load_edgelist(file, undirected=True):
         t0 = time()
         G = nx.read_edgelist(file)
         t1 = time()
-        logger.info('Undirected graph loaded in {}s'.format(t1 - t0))
+        print('Undirected graph loaded in {}s'.format(t1 - t0))
     else:
         t0 = time()
         G = nx.read_edgelist(file, create_using=nx.DiGraph())
         t1 = time()
-        logger.info('Directed graph loaded in {}s'.format(t1 - t0))
+        print('Directed graph loaded in {}s'.format(t1 - t0))
 
     return G
+
