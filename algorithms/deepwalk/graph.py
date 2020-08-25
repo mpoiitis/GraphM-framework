@@ -52,16 +52,14 @@ def load_adjacencylist(file, undirected=False):
     :param undirected: whether the graph should be undirected
     :return: the graph
     """
+
+    t0 = time()
+    G = nx.read_adjlist(file, create_using=nx.DiGraph())
+    t1 = time()
+    print('Graph loaded in {}s'.format(t1 - t0))
+
     if undirected:
-        t0 = time()
-        G = nx.read_adjlist(file)
-        t1 = time()
-        print('Undirected graph loaded in {}s'.format(t1 - t0))
-    else:
-        t0 = time()
-        G = nx.read_adjlist(file, create_using=nx.DiGraph())
-        t1 = time()
-        print('Directed graph loaded in {}s'.format(t1 - t0))
+        G = G.to_undirected()
 
     return G
 
@@ -73,16 +71,14 @@ def load_edgelist(file, undirected=True):
         :param undirected: whether the graph should be undirected
         :return: the graph
         """
+
+    t0 = time()
+    G = nx.read_edgelist(file, create_using=nx.DiGraph())
+    t1 = time()
+    print('Graph loaded in {}s'.format(t1 - t0))
+
     if undirected:
-        t0 = time()
-        G = nx.read_edgelist(file)
-        t1 = time()
-        print('Undirected graph loaded in {}s'.format(t1 - t0))
-    else:
-        t0 = time()
-        G = nx.read_edgelist(file, create_using=nx.DiGraph())
-        t1 = time()
-        print('Directed graph loaded in {}s'.format(t1 - t0))
+        G = G.to_undirected()
 
     return G
 
