@@ -10,7 +10,7 @@ def deepWalk(args, G):
 
     print("Number of nodes: {}".format(len(G.nodes())))
 
-    num_walks = len(G.nodes()) * args.number_walks
+    num_walks = len(G.nodes()) * args.num_walks
 
     print("Number of walks: {}".format(num_walks))
 
@@ -19,10 +19,10 @@ def deepWalk(args, G):
     print("Data size (walks*length): {}".format(data_size))
 
     print("Walking...")
-    walks = graph.build_deepwalk_corpus(G, num_paths=args.number_walks,
+    walks = graph.build_deepwalk_corpus(G, num_paths=args.num_walks,
                                     path_length=args.walk_length, alpha=0, rand=random.Random(args.seed))
     print("Training...")
-    model = Word2Vec(walks, size=args.representation_size, window=args.window_size, min_count=0, sg=1, hs=1, workers=args.workers)
+    model = Word2Vec(walks, size=args.dimension, window=args.window_size, min_count=0, sg=1, hs=1, workers=args.workers)
 
 
     model.wv.save_word2vec_format(args.output)
