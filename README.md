@@ -4,45 +4,47 @@ A framework for network embeddings for the task of Network Representation Learni
 
 ## DeepWalk
 
-DeepWalk uses short random walks to learn representations for vertices in graphs.
+DeepWalk uses short random walks alongside Word2Vec to learn representations for vertices in graphs.
 
 ### Usage
 
+**Parameters**
+- input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
+- output: Output representation file path. Suggested: "output/name_of_the_embedding". Required
+- dimension: Number of latent dimensions to learn for each node. Default: 64
+- num-walks: Number of random walks to start at each node. Default: 10
+- walk-length: Length of the random walk started at each node. Default: 40
+- window-size: Window size of skipgram model. Default: 5
+- seed: Seed for random walk generator. Default: 0
+- directed: Graph is (un)directed. Default: False
+- workers: Number of parallel processes. Default: 1
+
 **Example Usage**
-    ``$python main.py deepwalk --format adjlist --input data/karate.adjlist --number-walks 80 --representation-size 128 --walk-length 40 --window-size 10
-    --workers 1 --output output/karate.embeddings``
+    ``$python main.py deepwalk --input karate --output output/karate.embeddings --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
 
 The parameters specified here are the same as in the paper.
 
-**--input**:  *input_filename*
+## Node2Vec
 
-    1. ``--format adjlist`` for an adjacency list, e.g::
+Node2Vec extends DeepWalk by introducing parameters p and q to allow BFS/DFS-like search during the short random walks alongside alias sampling for efficient sampling.
 
-        1 2 3 4 5 6 7 8 9 11 12 13 14 18 20 22 32
-        2 1 3 4 8 14 18 20 22 31
-        3 1 2 4 8 9 10 14 28 29 33
-        ...
-    
-    2. ``--format edgelist`` for an edge list, e.g::
-    
-        1 2
-        1 3
-        1 4
-        ...
+### Usage
 
-**--output**: *output_filename*
+**Parameters**
+- input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
+- output: Output representation file path. Suggested: "output/name_of_the_embedding". Required
+- dimension: Number of latent dimensions to learn for each node. Default: 128
+- num-walks: Number of random walks to start at each node. Default: 10
+- walk-length: Length of the random walk started at each node. Default: 80
+- window-size: Window size of skipgram model. Default: 10
+- p: Return hyperparameter. Default: 1
+- q: In-Out hyperparameter. Default: 1
+- iter: Number of epochs in SGD. Default: 1
+- weighted  : Boolean specifying (un)weighted. Default: False
+- directed: Graph is (un)directed. Default: False
+- workers: Number of parallel processes. Default: 1
 
-    The output representations in skipgram format - first line is header, all other lines are node-id and *d* dimensional representation:
+**Example Usage**
+    ``$python main.py node2vec --input karate --output output/karate.embeddings --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
 
-        34 64
-        1 0.016579 -0.033659 0.342167 -0.046998 ...
-        2 -0.007003 0.265891 -0.351422 0.043923 ...
-        ...
-
-# Notes
-
-Gensim package has a minor modification on gensim/models/word2vec.py, line 1704 where:
-
-    wv.vectors[i] = self.seeded_vector(wv.index2word[i] + str(self.seed), wv.vector_size)
-    is replaced by
-    wv.vectors[i] = self.seeded_vector(wv.index2word[i] + self.seed, wv.vector_size)
+The parameters specified here are the same as in the paper.
