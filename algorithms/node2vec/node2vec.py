@@ -1,6 +1,5 @@
 from gensim.models import Word2Vec
 from . import graph
-import readData
 
 def learn_embeddings(walks, args):
     '''
@@ -13,15 +12,10 @@ def learn_embeddings(walks, args):
 
     return
 
-def node2vec(args):
-    if args.format == "adjlist":
-        nx_G = readData.load_adjacencylist(args.input, directed=args.directed, weighted= args.weighted)
-    elif args.format == "edgelist":
-        nx_G = readData.load_edgelist(args.input, directed=args.directed, weighted= args.weighted)
-    else:
-        raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
 
-    G = graph.Graph(nx_G, args.directed, args.p, args.q)
-    G.preprocess_transition_probs()
-    walks = G.simulate_walks(args.num_walks, args.walk_length)
+def node2vec(args, G):
+
+    n2v_G = graph.Graph(G, args.directed, args.p, args.q)
+    n2v_G.preprocess_transition_probs()
+    walks = n2v_G.simulate_walks(args.num_walks, args.walk_length)
     learn_embeddings(walks, args)

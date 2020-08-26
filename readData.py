@@ -5,6 +5,8 @@ from scipy.io import loadmat
 from scipy.sparse import issparse
 import os
 import numpy as np
+import readData
+
 
 def load_edgelist(file, directed=False, weighted=None):
     """
@@ -98,6 +100,14 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     return G, x, y
 
 
+def load_karate(file, directed=False, weighted=None):
+    return load_adjacencylist(file, directed, weighted)
+
+
+def load_gnutella(file, directed=False, weighted=None):
+    return load_edgelist(file, directed, weighted)
+
+
 def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citeseer.content', directed=True):
     """
     Load one of two citation networks available, CiteSeer and Cora
@@ -151,4 +161,36 @@ def load_facebook(file, directory, directed=False):
     return G, x, y
 
 
-G = load_facebook('data/facebook_combined.txt', 'data/facebook')
+def load_graph(args):
+    """
+    Loads the graph according to the specified input dataset
+    :param args: the cli arguments
+    :return: the corresponding graph
+    """
+
+    # Karate and GNutella do not contain features and labels
+    x = None
+    y = None
+
+    if args.input == "karate":
+        G = readData.load_karate('data/karate.adjlist', directed=args.directed)
+    elif args.input == "nutella":
+        G = readData.load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed)
+    elif args.input == 'amherst':
+        G, x, y = readData.load_matfile('data/Amherst41.mat', directed=args.directed)
+    elif args.input == 'hamilton':
+        G, x, y = readData.load_matfile('data/Hamilton46.mat', directed=args.directed)
+    elif args.input == 'mich':
+        G, x, y = readData.load_matfile('data/Mich67.mat', directed=args.directed)
+    elif args.input == 'rochester':
+        G, x, y = readData.load_matfile('data/Rochester38.mat', directed=args.directed)
+    elif args.input == 'cora':
+        G, x, y = readData.load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
+    elif args.input == 'citeseer':
+        G, x, y = readData.load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
+    elif args.input == 'facebook':
+        G, x, y = readData.load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
+    else:
+        raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
+
+    return G, x, y

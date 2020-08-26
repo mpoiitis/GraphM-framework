@@ -1,15 +1,15 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from algorithms.deepwalk.deepwalk import deepWalk
 from algorithms.node2vec.node2vec import node2vec
-
+from readData import load_graph
 
 def parse_args():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, conflict_handler='resolve')
     subparsers = parser.add_subparsers(dest='method', help="deepWalk. More algorithms will be implemented")
 
     deepwalk_parser = subparsers.add_parser('deepwalk', help='DeepWalk method')
-    deepwalk_parser.add_argument('--format', default='adjlist', help='File format of input file')
-    deepwalk_parser.add_argument('--input', nargs='?', required=True, help='Input graph file')
+    deepwalk_parser.add_argument('--input', required=True, choices=['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
+            help="Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
     deepwalk_parser.add_argument('--output', required=True, help='Output representation file')
     deepwalk_parser.add_argument('--representation-size', default=64, type=int, help='Number of latent dimensions to learn for each node.')
     deepwalk_parser.add_argument('--number-walks', default=10, type=int, help='Number of random walks to start at each node')
@@ -22,7 +22,8 @@ def parse_args():
     deepwalk_parser.add_argument('--workers', default=1, type=int, help='Number of parallel processes.')
 
     node2vec_parser = subparsers.add_parser('node2vec', help='Node2Vec method')
-    node2vec_parser.add_argument('--format', default='adjlist', help='File format of input file')
+    node2vec_parser.add_argument('--input', required=True, choices=['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
+                                 help="Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
     node2vec_parser.add_argument('--input', nargs='?', required=True, help='Input graph file')
     node2vec_parser.add_argument('--output', nargs='?', required=True, help='Output representation file')
     node2vec_parser.add_argument('--representation-size', type=int, default=128, help='Number of dimensions. Default is 128.')
@@ -44,9 +45,12 @@ def parse_args():
 
     return args
 
+
 if __name__ == "__main__":
     args = parse_args()
+    G, x, y = load_graph(args)
+
     if args.method == 'deepwalk':
-        deepWalk(args)
+        deepWalk(args, G)
     else:
-        node2vec(args)
+        node2vec(args, G)
