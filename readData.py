@@ -5,7 +5,6 @@ from scipy.io import loadmat
 from scipy.sparse import issparse
 import os
 import numpy as np
-import readData
 
 
 def load_edgelist(file, directed=False, weighted=False):
@@ -177,28 +176,28 @@ def load_graph(args):
 
     if args.input == "karate":
         if not 'weighted' in args:
-            G = readData.load_karate('data/karate.adjlist', directed=args.directed)
+            G = load_karate('data/karate.adjlist', directed=args.directed)
         else:
-            G = readData.load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
+            G = load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
     elif args.input == "nutella":
         if not 'weighted' in args:
-            G = readData.load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed)
+            G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed)
         else:
-            G = readData.load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
+            G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
     elif args.input == 'amherst':
-        G, x, y = readData.load_matfile('data/Amherst41.mat', directed=args.directed)
+        G, x, y = load_matfile('data/Amherst41.mat', directed=args.directed)
     elif args.input == 'hamilton':
-        G, x, y = readData.load_matfile('data/Hamilton46.mat', directed=args.directed)
+        G, x, y = load_matfile('data/Hamilton46.mat', directed=args.directed)
     elif args.input == 'mich':
-        G, x, y = readData.load_matfile('data/Mich67.mat', directed=args.directed)
+        G, x, y = load_matfile('data/Mich67.mat', directed=args.directed)
     elif args.input == 'rochester':
-        G, x, y = readData.load_matfile('data/Rochester38.mat', directed=args.directed)
+        G, x, y = load_matfile('data/Rochester38.mat', directed=args.directed)
     elif args.input == 'cora':
-        G, x, y = readData.load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
+        G, x, y = load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
     elif args.input == 'citeseer':
-        G, x, y = readData.load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
+        G, x, y = load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
     elif args.input == 'facebook':
-        G, x, y = readData.load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
+        G, x, y = load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
     else:
         raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
 
