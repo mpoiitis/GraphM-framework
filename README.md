@@ -48,3 +48,10 @@ Node2Vec extends DeepWalk by introducing parameters p and q to allow BFS/DFS-lik
     ``$python main.py node2vec --input karate --output output/karate.embeddings --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
 
 The parameters specified here are the same as in the paper.
+
+# Notes
+Gensim package has a minor modification on gensim/models/word2vec.py, line 1704 where:
+
+    wv.vectors[i] = self.seeded_vector(wv.index2word[i] + str(self.seed), wv.vector_size)
+    is replaced by
+    wv.vectors[i] = self.seeded_vector(str(wv.index2word[i]) + str(self.seed), wv.vector_size)
