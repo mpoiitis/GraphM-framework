@@ -32,9 +32,17 @@ The parameters specified here are the same as in the paper.
 
 **--output**: *output_filename*
 
-    The output representations in skipgram format - first line is header, all other lines are node-id and *d* dimensional representation::
+    The output representations in skipgram format - first line is header, all other lines are node-id and *d* dimensional representation:
 
         34 64
         1 0.016579 -0.033659 0.342167 -0.046998 ...
         2 -0.007003 0.265891 -0.351422 0.043923 ...
         ...
+
+# Notes
+
+Gensim package has a minor modification on gensim/models/word2vec.py, line 1704 where:
+
+    wv.vectors[i] = self.seeded_vector(wv.index2word[i] + str(self.seed), wv.vector_size)
+    is replaced by
+    wv.vectors[i] = self.seeded_vector(wv.index2word[i] + self.seed, wv.vector_size)
