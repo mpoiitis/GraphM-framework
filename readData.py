@@ -8,7 +8,7 @@ import numpy as np
 import readData
 
 
-def load_edgelist(file, directed=False, weighted=None):
+def load_edgelist(file, directed=False, weighted=False):
     """
     Load graph from edge list
     :param file: the edge list file
@@ -17,9 +17,7 @@ def load_edgelist(file, directed=False, weighted=None):
     :return: the graph
     """
     t0 = time()
-    if weighted == None:
-        G = nx.read_edgelist(file, nodetype=int, create_using=nx.DiGraph())
-    elif weighted:
+    if weighted:
         G = nx.read_edgelist(file, nodetype=int, data=(('weight', float),), create_using=nx.DiGraph())
     else: # false. This is different from None. Only applicable to methods that support weights.
         G = nx.read_edgelist(file, nodetype=int, create_using=nx.DiGraph())
@@ -35,7 +33,7 @@ def load_edgelist(file, directed=False, weighted=None):
     return G
 
 
-def load_adjacencylist(file, directed=False, weighted=None):
+def load_adjacencylist(file, directed=False, weighted=False):
     """
     Load graph from adjacency list
     :param file: the adjacency list file
@@ -44,9 +42,7 @@ def load_adjacencylist(file, directed=False, weighted=None):
     :return: the graph
     """
     t0 = time()
-    if weighted == None:
-        G = nx.read_adjlist(file, nodetype=int, create_using=nx.DiGraph())
-    elif weighted:
+    if weighted:
         G = nx.read_adjlist(file, nodetype=int, data=(('weight', float),), create_using=nx.DiGraph())
     else: # false. This is different from None. Only applicable to methods that support weights.
         G = nx.read_adjlist(file, nodetype=int, create_using=nx.DiGraph())
@@ -60,6 +56,15 @@ def load_adjacencylist(file, directed=False, weighted=None):
     print('Graph loaded in {}s'.format(t1 - t0))
 
     return G
+
+
+
+def load_karate(file, directed=False, weighted=None):
+    return load_adjacencylist(file, directed, weighted)
+
+
+def load_gnutella(file, directed=False, weighted=None):
+    return load_edgelist(file, directed, weighted)
 
 
 def load_matfile(file='data/Amherst41.mat', directed=False):
@@ -91,6 +96,9 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     else:
         raise Exception("Dense matrices not yet supported.")
 
+    for edge in G.edges():
+        G[edge[0]][edge[1]]['weight'] = 1
+
     if not directed:
         G = G.to_undirected()
 
@@ -98,14 +106,6 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     print('Graph loaded in {}s'.format(t1 - t0))
 
     return G, x, y
-
-
-def load_karate(file, directed=False, weighted=None):
-    return load_adjacencylist(file, directed, weighted)
-
-
-def load_gnutella(file, directed=False, weighted=None):
-    return load_edgelist(file, directed, weighted)
 
 
 def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citeseer.content', directed=True):
@@ -124,6 +124,9 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
     df = pd.read_csv(contentFile, sep="\t")
     x = df.iloc[:, :-1] # drop last column
     y = df.iloc[:, -1] # labels are stored in df's last column
+
+    for edge in G.edges():
+        G[edge[0]][edge[1]]['weight'] = 1
 
     if not directed:
         G = G.to_undirected()
@@ -173,9 +176,9 @@ def load_graph(args):
     y = None
 
     if args.input == "karate":
-        G = readData.load_karate('data/karate.adjlist', directed=args.directed)
+        G = readData.load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
     elif args.input == "nutella":
-        G = readData.load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed)
+        G = readData.load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
     elif args.input == 'amherst':
         G, x, y = readData.load_matfile('data/Amherst41.mat', directed=args.directed)
     elif args.input == 'hamilton':
