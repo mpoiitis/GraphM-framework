@@ -24,7 +24,6 @@ def parse_args():
     node2vec_parser = subparsers.add_parser('node2vec', help='Node2Vec method')
     node2vec_parser.add_argument('--input', required=True, choices=['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
                                  help="Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
-    node2vec_parser.add_argument('--input', nargs='?', required=True, help='Input graph file')
     node2vec_parser.add_argument('--output', nargs='?', required=True, help='Output representation file')
     node2vec_parser.add_argument('--representation-size', type=int, default=128, help='Number of dimensions. Default is 128.')
     node2vec_parser.add_argument('--num-walks', type=int, default=10, help='Number of walks per source. Default is 10.')
