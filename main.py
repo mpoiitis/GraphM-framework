@@ -16,7 +16,7 @@ def parse_args():
     deepwalk_parser.add_argument('--walk-length', default=40, type=int, help='Length of the random walk started at each node')
     deepwalk_parser.add_argument('--window-size', default=5, type=int, help='Window size of skipgram model.')
     deepwalk_parser.add_argument('--seed', default=0, type=int, help='Seed for random walk generator.')
-    deepwalk_parser.add_argument('--undirected', default=True, type=bool, help='Treat graph as undirected.')
+    deepwalk_parser.add_argument('--directed', default=False, type=bool, help='Treat graph as directed.')
     deepwalk_parser.add_argument('--vertex-freq-degree', default=False, action='store_true', help='Use vertex degree to'
             'estimate the frequency of nodes in the random walks. This option is faster than calculating the vocabulary.')
     deepwalk_parser.add_argument('--workers', default=1, type=int, help='Number of parallel processes.')

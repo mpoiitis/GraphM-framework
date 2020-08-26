@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import readData
 from . import graph
 from gensim.models import Word2Vec
 
@@ -9,9 +10,9 @@ from gensim.models import Word2Vec
 def deepWalk(args):
 
     if args.format == "adjlist":
-        G = graph.load_adjacencylist(args.input, undirected=args.undirected)
+        G = readData.load_adjacencylist(args.input, directed=args.directed)
     elif args.format == "edgelist":
-        G = graph.load_edgelist(args.input, undirected=args.undirected)
+        G = readData.load_edgelist(args.input, directed=args.directed)
     else:
         raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
 
