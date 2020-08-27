@@ -175,15 +175,9 @@ def load_graph(args):
     y = None
 
     if args.input == "karate":
-        if not 'weighted' in args:
-            G = load_karate('data/karate.adjlist', directed=args.directed)
-        else:
-            G = load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
+        G = load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
     elif args.input == "nutella":
-        if not 'weighted' in args:
-            G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed)
-        else:
-            G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
+        G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
     elif args.input == 'amherst':
         G, x, y = load_matfile('data/Amherst41.mat', directed=args.directed)
     elif args.input == 'hamilton':
