@@ -27,11 +27,11 @@ def parse_args():
     node2vec_parser.add_argument('--workers', default=1, type=int, help='Number of parallel workers. Default is 1.')
 
     mnmf_parser = subparsers.add_parser('mnmf', help='M-NMF method')
-    mnmf_parser.add_argument("--cluster-mean-output", nargs="?",  default="output/cluster_means/means.csv", help="Cluster means path.")
-    mnmf_parser.add_argument("--assignment-output", nargs="?", default="output/assignments/assignment.json", help="Assignment path.")
+    mnmf_parser.add_argument("--cluster-mean-output", nargs="?",  default="output/mnmf/cluster_means/means.csv", help="Cluster means path.")
+    mnmf_parser.add_argument("--dump-matrices", default=True, type=bool, help="Save the embeddings to disk or not.")
     mnmf_parser.add_argument('--dimension', default=16, type=int, help='Number of latent dimensions to learn for each node. Default is 128.')
     mnmf_parser.add_argument("--clusters", default=20, type=int, help="Number of clusters.")
-    mnmf_parser.add_argument("--lambda", default=0.2, type=float, help="Weight of the cluster membership constraint.")
+    mnmf_parser.add_argument("--lambd", default=0.2, type=float, help="Weight of the cluster membership constraint.")
     mnmf_parser.add_argument("--alpha", default=0.05, type=float, help="Weight of clustering cost.")
     mnmf_parser.add_argument("--beta", default=0.05, type=float, help="Weight of modularity cost.")
     mnmf_parser.add_argument("--eta", default=5.0, type=float, help="Weight of second order similarities.")
@@ -39,8 +39,8 @@ def parse_args():
     mnmf_parser.add_argument("--early-stopping", default=3, type=int, help="Number of iterations to do after reaching the best modularity value.")
     mnmf_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Lowest possible component value.")
 
-    parser.add_argument('--input', required=True, choices=['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
-                        help="Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
+    parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
+                        help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
     parser.add_argument('--output', required=True, help='Output representation file path')
     parser.add_argument('--weighted', default=False, type=bool, help='Boolean specifying (un)weighted. Default is False.')
     parser.add_argument('--directed', default=False, type=bool, help='Graph is (un)directed. Default is False.')
