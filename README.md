@@ -47,6 +47,27 @@ Node2Vec[[2]](#2) extends DeepWalk by introducing parameters p and q to allow BF
 
 The parameters specified here are the same as in the paper.
 
+## Modularized Nonnegative Matrix Factorization (M-NMF)
+
+M-NMF[[8]](#8) incorporates the community structure into network embedding. Additionally, it captures 1st and 2nd order proximity but it can easily extend to higher-order proximities as well.
+
+### Usage
+
+**Parameters**
+- dimension: Number of latent dimensions to learn for each node. Default: 16
+- clusters: Number of clusters. Default: 20
+- lambd: Weight of the cluster membership constraint. Default: 0.2
+- alpha: Weight of clustering cost. Default: 0.05
+- beta: Weight of modularity cost. Default: 0.05
+- eta: Weight of second order similarities. Default: 5.0
+- iter: Number of weight updates. Default: 200
+- early-stopping: Number of iterations to do after reaching the best modularity value. Default: 3
+- lower-control: Lowest possible component value. Default: 10 ** -15
+
+**Example Usage**
+    ``$python main.py --input karate --output output/karate.embeddings mnmf --dimension 80 --cluster 10 --lambd 0.1 --alpha 0.1 --beta 0.1 --eta 3.0 --iter 100 ``
+
+The parameters specified here are the same as in the paper.
 # Benchmark Datasets
 - Karate [[3]](#3)
 - p2p-Gnutella [[4]](#4)
@@ -86,3 +107,6 @@ https://linqs.soe.ucsc.edu/data
 
 <a id="7">[7]</a> 
 http://snap.stanford.edu/data/egonets-Facebook.html
+
+<a id="8">[8]</a> 
+Wang, X., Cui, P., Wang, J., Pei, J., Zhu, W., & Yang, S. (2017, February). Community preserving network embedding. In AAAI (Vol. 17, pp. 203-209).

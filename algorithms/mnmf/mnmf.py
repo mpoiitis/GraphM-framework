@@ -92,7 +92,7 @@ class MNMF:
         """
         indices = np.argmax(H, axis=1)
         indices = {list(self.G.nodes)[i]: int(indices[i]) for i, _ in enumerate(indices)}
-        print(indices)
+
         current_modularity = community.modularity(indices, self.G)
         if current_modularity > self.best_modularity:
             self.best_modularity = current_modularity

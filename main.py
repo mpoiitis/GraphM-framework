@@ -29,7 +29,7 @@ def parse_args():
     mnmf_parser = subparsers.add_parser('mnmf', help='M-NMF method')
     mnmf_parser.add_argument("--cluster-mean-output", nargs="?",  default="output/mnmf/cluster_means/means.csv", help="Cluster means path.")
     mnmf_parser.add_argument("--dump-matrices", default=True, type=bool, help="Save the embeddings to disk or not.")
-    mnmf_parser.add_argument('--dimension', default=16, type=int, help='Number of latent dimensions to learn for each node. Default is 128.')
+    mnmf_parser.add_argument('--dimension', default=16, type=int, help='Number of latent dimensions to learn for each node. Default is 16.')
     mnmf_parser.add_argument("--clusters", default=20, type=int, help="Number of clusters.")
     mnmf_parser.add_argument("--lambd", default=0.2, type=float, help="Weight of the cluster membership constraint.")
     mnmf_parser.add_argument("--alpha", default=0.05, type=float, help="Weight of clustering cost.")
