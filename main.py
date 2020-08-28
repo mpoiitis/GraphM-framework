@@ -41,11 +41,11 @@ def parse_args():
     mnmf_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Lowest possible component value.")
 
     line_parser = subparsers.add_parser('line', help='LINE method')
-    line_parser.add_argument("--iter", default=100, type=int, help="Number of iterations for SGD")
+    line_parser.add_argument("--iter", default=100, type=int, help="Number of iterations for SGD. Default is 100")
     line_parser.add_argument("--dimension", default=128, type=int, help="Number of latent dimensions to learn for each node. Default is 128.")
-    line_parser.add_argument("--batch-size", default=1000, type=float, help="Size of batch for the SGD")
-    line_parser.add_argument("--negative-sampling", default='uniform', type=str, choices=['uniform', 'non-uniform'], help="How to perform negative sampling.")
-    line_parser.add_argument("--negative-ratio", default=5, type=int, help="")
+    line_parser.add_argument("--batch-size", default=1000, type=int, help="Size of batch for the SGD. Default is 1000")
+    line_parser.add_argument("--negative-sampling", default='uniform', type=str, choices=['uniform', 'non-uniform'], help="How to perform negative sampling. Default is 'uniform'")
+    line_parser.add_argument("--negative-ratio", default=5, type=int, help="Parameter for negative sampling. Default is 5")
 
     parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
                         help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")

@@ -39,7 +39,7 @@ def batchgen_train(adj_list, numNodes, batch_size, negativeRatio, negative_sampl
 
     data = np.ones((adj_list.shape[0]), dtype=np.float32)
     mat = csr_matrix((data, (adj_list[:,0], adj_list[:,1])), shape = (numNodes, numNodes), dtype=np.float32)
-    batch_size_ones = np.ones((batch_size), dtype=np.float32)
+    batch_size_ones = np.ones((batch_size), dtype=np.int32)
 
     nb_train_sample = adj_list.shape[0]
     index_array = np.arange(nb_train_sample)

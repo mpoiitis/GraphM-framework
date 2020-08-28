@@ -1,11 +1,19 @@
 # GraphM-framework
 A framework for network embeddings for the task of Network Representation Learning
 
+## Implemented Algorithms
+
+- DeepWalk[[1]](#1)
+- Node2Vec[[2]](#2)
+- M-NMF[[8]](#8)
+- LINE[[9]](#9)
+
 ## Generic Parameters
 - input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
 - output: Output representation file path. Suggested: "output/name_of_the_embedding". Required
 - weighted  : Boolean specifying (un)weighted. Default: False
 - directed: Graph is (un)directed. Default: False
+
 ## DeepWalk
 
 DeepWalk[[1]](#1) uses short random walks alongside Word2Vec to learn representations for vertices in graphs.
@@ -68,6 +76,25 @@ M-NMF[[8]](#8) incorporates the community structure into network embedding. Addi
     ``$python main.py --input karate --output output/karate.embeddings mnmf --dimension 80 --cluster 10 --lambd 0.1 --alpha 0.1 --beta 0.1 --eta 3.0 --iter 100 ``
 
 The parameters specified here are the same as in the paper.
+
+## Modularized Nonnegative Matrix Factorization (M-NMF)
+
+LINE[[9]](#9) is able to embed very large-scale information networks. It is suitable for a variety of networks including directed, undirected, binary or weighted edges.
+
+### Usage
+
+**Parameters**
+- iter: Number of iterations for SGD. Default: 100
+- dimension: Number of latent dimensions to learn for each node. Default: 128
+- batch-size: Size of batch for the SGD. Default: 1000
+- negative-sampling: How to perform negative sampling. Default: 'uniform'
+- negative-ratio: Parameter for negative sampling. Default: 5
+
+**Example Usage**
+    ``$python main.py --input karate --output output/karate.embeddings line --dimension 80 --iter 100  --batch-size 300 --negative-sampling non-uniform --negative-ratio 2``
+
+The parameters specified here are the same as in the paper.
+
 # Benchmark Datasets
 - Karate [[3]](#3)
 - p2p-Gnutella [[4]](#4)
@@ -110,3 +137,6 @@ http://snap.stanford.edu/data/egonets-Facebook.html
 
 <a id="8">[8]</a> 
 Wang, X., Cui, P., Wang, J., Pei, J., Zhu, W., & Yang, S. (2017, February). Community preserving network embedding. In AAAI (Vol. 17, pp. 203-209).
+
+<a id="9">[9]</a> 
+Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., & Mei, Q. (2015, May). Line: Large-scale information network embedding. In Proceedings of the 24th international conference on world wide web (pp. 1067-1077).
