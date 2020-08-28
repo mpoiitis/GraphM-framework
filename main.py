@@ -2,6 +2,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from algorithms.deepwalk.deepwalk import deepWalk
 from algorithms.node2vec.node2vec import node2vec
 from algorithms.mnmf.mnmf import mNMF
+from algorithms.line.line import line
 from readData import load_graph
 
 def parse_args():
@@ -39,6 +40,13 @@ def parse_args():
     mnmf_parser.add_argument("--early-stopping", default=3, type=int, help="Number of iterations to do after reaching the best modularity value.")
     mnmf_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Lowest possible component value.")
 
+    line_parser = subparsers.add_parser('line', help='LINE method')
+    line_parser.add_argument("--iter", default=100, type=int, help="Number of iterations for SGD")
+    line_parser.add_argument("--dimension", default=128, type=int, help="Number of latent dimensions to learn for each node. Default is 128.")
+    line_parser.add_argument("--batch-size", default=1000, type=float, help="Size of batch for the SGD")
+    line_parser.add_argument("--negative-sampling", default='uniform', type=str, choices=['uniform', 'non-uniform'], help="How to perform negative sampling.")
+    line_parser.add_argument("--negative-ratio", default=5, type=int, help="")
+
     parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
                         help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
     parser.add_argument('--output', required=True, help='Output representation file path')
@@ -60,5 +68,7 @@ if __name__ == "__main__":
         node2vec(args, G)
     elif args.method == 'mnmf':
         mNMF(args, G)
+    elif args.method == 'line':
+        line(args, G)
     else:
         pass

@@ -57,7 +57,6 @@ def load_adjacencylist(file, directed=False, weighted=False):
     return G
 
 
-
 def load_karate(file, directed=False, weighted=None):
     return load_adjacencylist(file, directed, weighted)
 
