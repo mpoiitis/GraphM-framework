@@ -82,6 +82,9 @@ if __name__ == "__main__":
     elif args.method == 'line':
         line(args, G)
     elif args.method == 'tadw':
-        tadw(args, G, x)
+        if not x:
+            print('Node features are required to run TADW.')
+        else:
+            tadw(args, G, x)
     else:
         pass
