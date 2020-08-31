@@ -98,7 +98,7 @@ The parameters specified here are the same as in the paper.
 
 ## Text-Associated DeepWalk (TADW)
 
-TADW[[10]](#10) learns an embedding of nodes and fuses the node representations with node attributes. Learns the joint feature-proximal representations using regularized non-negative matrix factorization.
+TADW[[10]](#10) learns an embedding of nodes and fuses the node representations with node attributes. Learns the joint feature-proximal representations using regularized non-negative matrix factorization. TADW requires features to run, hence datasets Karate and p2p-Gnutella are not compatible.
 
 ### Usage
 
