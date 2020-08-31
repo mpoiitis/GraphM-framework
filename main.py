@@ -3,7 +3,9 @@ from algorithms.deepwalk.deepwalk import deepWalk
 from algorithms.node2vec.node2vec import node2vec
 from algorithms.mnmf.mnmf import mNMF
 from algorithms.line.line import line
+from algorithms.tadw.tadw_main import tadw
 from readData import load_graph
+
 
 def parse_args():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, conflict_handler='resolve')
@@ -47,6 +49,15 @@ def parse_args():
     line_parser.add_argument("--negative-sampling", default='uniform', type=str, choices=['uniform', 'non-uniform'], help="How to perform negative sampling. Default is 'uniform'")
     line_parser.add_argument("--negative-ratio", default=5, type=int, help="Parameter for negative sampling. Default is 5")
 
+    tadw_parser = subparsers.add_parser('tadw', help='TADW method')
+    tadw_parser.add_argument("--iter", default=200, type=int, help="Number of iterations for SGD. Default is 200")
+    tadw_parser.add_argument("--dimension", default=32, type=int, help="Number of latent dimensions to learn for each node. Default is 32")
+    tadw_parser.add_argument("--order", default=2, type=int, help="Target matrix approximation order. Default is 2")
+    tadw_parser.add_argument("--lambd", default=1000.0, type=float, help="Regularization term coefficient. Default is 1000")
+    tadw_parser.add_argument("--alpha", default=10**-6, type=float, help="Learning rate. Default is 10^-6")
+    tadw_parser.add_argument("--features", default="sparse", type=str, choices=['dense', 'sparse'], help="Output embedding. Default is sparse")
+    tadw_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Overflow control. Default is 10**-15")
+
     parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
                         help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
     parser.add_argument('--output', required=True, help='Output representation file path')
@@ -70,5 +81,7 @@ if __name__ == "__main__":
         mNMF(args, G)
     elif args.method == 'line':
         line(args, G)
+    elif args.method == 'tadw':
+        tadw(args, G, x)
     else:
         pass

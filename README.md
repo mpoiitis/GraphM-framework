@@ -3,10 +3,11 @@ A framework for network embeddings for the task of Network Representation Learni
 
 ## Implemented Algorithms
 
-- DeepWalk[[1]](#1)
-- Node2Vec[[2]](#2)
-- M-NMF[[8]](#8)
-- LINE[[9]](#9)
+- DeepWalk [[1]](#1)
+- Node2Vec [[2]](#2)
+- M-NMF [[8]](#8)
+- LINE [[9]](#9)
+- TADW [[10]](#10)
 
 ## Generic Parameters
 - input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
@@ -95,6 +96,26 @@ LINE[[9]](#9) is able to embed very large-scale information networks. It is suit
 
 The parameters specified here are the same as in the paper.
 
+## Text-Associated DeepWalk (TADW)
+
+TADW[[10]](#10) learns an embedding of nodes and fuses the node representations with node attributes. Learns the joint feature-proximal representations using regularized non-negative matrix factorization.
+
+### Usage
+
+**Parameters**
+
+- iter: Number of iterations for SGD. Default: 200
+- dimension: Number of latent dimensions to learn for each node. Default: 32 (the final embedding will have 2 * 32 as two vectors are concatenated)
+- lambd: Regularization term coefficient. Default: 1000
+- alpha: Learning rate. Default: 10^-6
+- order: Target matrix approximation order. Default: 2
+- features: Output embedding. Default: sparse
+- lower-control: Overflow control. Default: 10**-15
+
+**Example Usage**
+    ``$python main.py --input karate --output output/karate.embeddings tadw --features dense --iter 50 --dimension 128 --lambd 500 --alpha 1000 --order 1 ``
+
+
 # Benchmark Datasets
 - Karate [[3]](#3)
 - p2p-Gnutella [[4]](#4)
@@ -140,3 +161,6 @@ Wang, X., Cui, P., Wang, J., Pei, J., Zhu, W., & Yang, S. (2017, February). Comm
 
 <a id="9">[9]</a> 
 Tang, J., Qu, M., Wang, M., Zhang, M., Yan, J., & Mei, Q. (2015, May). Line: Large-scale information network embedding. In Proceedings of the 24th international conference on world wide web (pp. 1067-1077).
+
+<a id="10">[10]</a>
+Yang, C., Liu, Z., Zhao, D., Sun, M., & Chang, E. Y. (2015, July). Network representation learning with rich text information. In IJCAI (Vol. 2015, pp. 2111-2117).

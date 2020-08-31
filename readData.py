@@ -119,9 +119,9 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
 
     t0 = time()
     G = nx.read_edgelist(citesFile, create_using=nx.DiGraph())
-    df = pd.read_csv(contentFile, sep="\t")
-    x = df.iloc[:, :-1] # drop last column
-    y = df.iloc[:, -1] # labels are stored in df's last column
+    df = pd.read_csv(contentFile, sep="\t", header=None)
+    x = df.iloc[:, :-1]  # drop last column
+    y = df.iloc[:, -1]  # labels are stored in df's last column
 
     for edge in G.edges():
         G[edge[0]][edge[1]]['weight'] = 1
