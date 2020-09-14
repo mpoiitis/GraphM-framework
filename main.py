@@ -4,6 +4,7 @@ from algorithms.node2vec.node2vec import node2vec
 from algorithms.mnmf.mnmf import mNMF
 from algorithms.line.line import line
 from algorithms.tadw.tadw_main import tadw
+from algorithms.tsec.tsec import tsec
 from readData import load_graph
 
 
@@ -59,14 +60,15 @@ def parse_args():
     tadw_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Overflow control. Default is 10**-15")
 
     tsec_parser = subparsers.add_parser('tsec', help='TSEC method')
-    tsec_parser.add_argument("--type", default='gcn', type=str, choices=['gcn, gcn_cheby'], help="Type of model. Default is gcn")
+    tsec_parser.add_argument("--type", default='gcn', type=str, choices=['gcn', 'gcn_cheby'], help="Type of model. Default is gcn")
     tsec_parser.add_argument("--iter", default=200, type=int, help="Number of iterations for SGD. Default is 200")
-    tsec_parser.add_argument("--layers", default=2, type=int, help="Number of graph convolutional layers. Default is 2")
-    tsec_parser.add_argument("--hidden-dim", default=16, type=int, help="Number of units in the hidden layers. Default is 16")
+    tsec_parser.add_argument("--dimension", default=128, type=int, help="Number of latent dimensions to learn for each node. Default is 128")
+    tsec_parser.add_argument("--hidden-dim", default=512, type=int, help="Number of units in the hidden layers. Default is 512")
+    tsec_parser.add_argument("--batch-size", default=128, type=int, help="Size of the batch used for training. Default is 128")
     tsec_parser.add_argument("--max-degree", default=3, type=int, help="Maximum Chebyshev polynomial degree. Default is 3")
     tsec_parser.add_argument("--learning-rate", default=0.01, type=float, help="Initial learning rate. Default is 0.01")
     tsec_parser.add_argument("--dropout", default=0.5, type=float, help="Dropout rate (1 - keep probability). Default is 0.5")
-    tsec_parser.add_argument("--weight-decay", default=5e-4, type=float, help="Weight for L2 loss on embedding matrix. Default is 5e-4")
+    tsec_parser.add_argument("--weight-decay", default=0.0008, type=float, help="Weight for L2 loss on embedding matrix. Default is 0.0008")
     tsec_parser.add_argument("--early-stopping", default=10, type=int, help="Tolerance for early stopping (# of epochs). Default is 10")
 
     parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
@@ -82,7 +84,7 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    G, x, y = load_graph(args)
+    G, x, y, node_dict = load_graph(args)
 
     if args.method == 'deepwalk':
         deepWalk(args, G)
@@ -97,5 +99,7 @@ if __name__ == "__main__":
             print('Node features are required to run TADW.')
         else:
             tadw(args, G, x)
+    elif args.method == 'tsec':
+        tsec(args, G, x, y, node_dict)
     else:
         pass

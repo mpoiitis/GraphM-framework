@@ -4,7 +4,7 @@ from scipy.sparse.linalg.eigen.arpack import eigsh
 
 def preprocess_features(features):
     """Row-normalize feature matrix"""
-    rowsum = np.array(features.sum(1))
+    rowsum = np.array(features.sum(1), dtype=np.float32)
     r_inv = np.power(rowsum, -1).flatten()
     r_inv[np.isinf(r_inv)] = 0.
     r_mat_inv = np.diag(r_inv)

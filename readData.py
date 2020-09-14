@@ -119,9 +119,28 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
 
     t0 = time()
     G = nx.read_edgelist(citesFile, create_using=nx.DiGraph())
+
     df = pd.read_csv(contentFile, sep="\t", header=None)
     x = df.iloc[:, :-1]  # drop last column
+    x.iloc[:, 0] = x.iloc[:, 0].astype(str)
     y = df.iloc[:, -1]  # labels are stored in df's last column
+
+    # map node names to int indices
+    node_dict = dict()
+    for i, n in enumerate(G.nodes()):
+        node_dict.update({str(n):i})
+    G = nx.relabel_nodes(G, node_dict)  # replace values in G
+    x.iloc[:, 0].replace(node_dict, inplace=True)  # replace values in x
+
+    # create all-zero rows for nodes that are not contained in the feature set
+    if x.shape[0] != len(G.nodes):
+        new_x = np.ndarray((len(G.nodes), x.shape[1]))
+        new_y = np.ndarray((len(G.nodes), 1), dtype=str)
+        for i, r in x.iterrows():
+           new_x[r.iloc[0], :] = r
+           new_y[r.iloc[0]] = y.iloc[i]
+        x = new_x
+        y = new_y
 
     for edge in G.edges():
         G[edge[0]][edge[1]]['weight'] = 1
@@ -132,7 +151,7 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
     t1 = time()
     print('Graph loaded in {}s'.format(t1 - t0))
 
-    return G, x, y
+    return G, x, y, node_dict
 
 
 def load_facebook(file, directory, directed=False):
@@ -172,6 +191,7 @@ def load_graph(args):
     # Karate and GNutella do not contain features and labels
     x = None
     y = None
+    node_dict = None
 
     if args.input == "karate":
         G = load_karate('data/karate.adjlist', directed=args.directed, weighted=args.weighted)
@@ -186,12 +206,12 @@ def load_graph(args):
     elif args.input == 'rochester':
         G, x, y = load_matfile('data/Rochester38.mat', directed=args.directed)
     elif args.input == 'cora':
-        G, x, y = load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
+        G, x, y, node_dict = load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
     elif args.input == 'citeseer':
-        G, x, y = load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
+        G, x, y, node_dict = load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
     elif args.input == 'facebook':
         G, x, y = load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
     else:
         raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
 
-    return G, x, y
+    return G, x, y, node_dict
