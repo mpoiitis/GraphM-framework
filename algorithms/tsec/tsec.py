@@ -73,6 +73,7 @@ def tsec(args, G, features, y, node_dict):
     # plt.legend(['train', 'validation'], loc='upper left')
     # plt.show()
 
+    # remove decoder layer to produce embeddings
     input = tf.keras.Input(shape=(X_train.shape[1],), name="encoder_input")
     encoder = model.layers[0](input)
     new_model = Model(inputs=input, outputs=encoder)
