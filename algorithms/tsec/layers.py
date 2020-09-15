@@ -61,15 +61,15 @@ class GraphConvolution(Layer):
 
     def call(self, inputs):
         x, a = inputs
-        x = tf.nn.dropout(x, self.dropout)
+        # x = tf.nn.dropout(x, self.dropout)
 
         # convolve
         if not self.featureless:  # if it has features x
             pre_h = tf.matmul(x, self.weights_)
         else:
             pre_h = self.weights_
-
         output = tf.matmul(a, pre_h)
+        print(a.shape, x.shape, self.weights_.shape, pre_h.shape, output.shape)
 
         # bias
         if self.bias:
