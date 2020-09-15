@@ -1,6 +1,6 @@
 from tensorflow.keras.layers import Layer, Dense
 import tensorflow as tf
-tf.compat.v1.enable_eager_execution()
+from .inits import glorot
 
 
 class Sampling(Layer):
@@ -46,7 +46,7 @@ class Decoder(Layer):
 
 
 class GraphConvolution(Layer):
-    def __init__(self, input_dim, output_dim, bias=False, featureless=False, dropout=0., activation=tf.nn.relu, **kwargs):
+    def __init__(self, input_dim, output_dim, bias=False, featureless=False, dropout=0., activation=tf.keras.activations.relu, **kwargs):
         super(GraphConvolution, self).__init__(**kwargs)
 
         self.dropout = dropout
@@ -54,24 +54,22 @@ class GraphConvolution(Layer):
         self.bias = bias
         self.featureless = featureless
 
-        self.weights_ = []
-        for i in range(1):
-            self.weights_ = self.add_weight(name='weight' + str(i), shape=[input_dim, output_dim])
+        self.weights_ = glorot([input_dim, output_dim], name='weights')
         if self.bias:
             self.bias = self.add_weight(name='bias', shape=[output_dim])
 
-    def call(self, inputs, **kwargs):
-        x, support = inputs
-        print(support.shape, x.shape, self.weights_.shape)
+
+    def call(self, inputs):
+        x, a = inputs
         x = tf.nn.dropout(x, self.dropout)
+
         # convolve
         if not self.featureless:  # if it has features x
-            pre_sup = tf.matmul(x, self.weights_)
+            pre_h = tf.matmul(x, self.weights_)
         else:
-            pre_sup = self.weights_
+            pre_h = self.weights_
 
-        support = tf.matmul(support, pre_sup)
-        output = support
+        output = tf.matmul(a, pre_h)
 
         # bias
         if self.bias:

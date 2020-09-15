@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras import Model
-from .layers import Encoder, Decoder
+from tensorflow.keras.layers import Dense
+from .layers import Encoder, Decoder, GraphConvolution
+
 
 class VariationalAutoEncoder(Model):
     """Combines the encoder and decoder into an end-to-end model for training."""
@@ -27,3 +29,35 @@ class VariationalAutoEncoder(Model):
         )
         self.add_loss(kl_loss)
         return reconstructed
+
+
+class GCN(Model):
+
+    def __init__(self, original_dim, output_dim=32, num_labels=2, dropout=0., weight_decay=0., name="gcn", **kwargs):
+        super(GCN, self).__init__(name=name, **kwargs)
+        self.original_dim = original_dim
+        self.weight_decay = weight_decay
+
+        self.layers_ = []
+        self.layers_.append(GraphConvolution(original_dim, output_dim, dropout=dropout, activation=tf.keras.activations.relu, name='gc1'))
+        self.layers_.append(GraphConvolution(output_dim, num_labels, dropout=dropout, activation=tf.keras.activations.softmax, name='gc2'))
+
+
+    def call(self, inputs):
+        x, a = inputs
+
+        outputs = [x]
+
+        for i, layer in enumerate(self.layers):
+            hidden = layer((outputs[-1], a))
+            outputs.append(hidden)
+
+        output = outputs[-1]
+
+        # Weight decay loss
+        loss = tf.zeros([])
+        for var in self.layers_[0].trainable_variables:
+            loss += self.weight_decay * tf.nn.l2_loss(var)
+
+        self.add_loss(loss)
+        return output

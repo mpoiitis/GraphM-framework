@@ -60,7 +60,8 @@ def parse_args():
     tadw_parser.add_argument("--lower-control", default=10 ** -15, type=float, help="Overflow control. Default is 10**-15")
 
     tsec_parser = subparsers.add_parser('tsec', help='TSEC method')
-    tsec_parser.add_argument("--type", default='gcn', type=str, choices=['gcn', 'gcn_cheby'], help="Type of model. Default is gcn")
+    tsec_parser.add_argument("--nn", default='gcn', type=str, choices=['gcn', 'autoencoder'], help="Type of neural network. Default is gcn")
+    tsec_parser.add_argument("--type", default='gcn', type=str, choices=['gcn', 'gcn_cheby'], help="Type of adjacency matrix. Default is gcn")
     tsec_parser.add_argument("--iter", default=200, type=int, help="Number of iterations for SGD. Default is 200")
     tsec_parser.add_argument("--dimension", default=128, type=int, help="Number of latent dimensions to learn for each node. Default is 128")
     tsec_parser.add_argument("--hidden-dim", default=512, type=int, help="Number of units in the hidden layers. Default is 512")
