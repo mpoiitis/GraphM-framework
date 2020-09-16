@@ -1,7 +1,6 @@
 from tensorflow.keras.layers import Layer, Dense
+from tensorflow.keras.regularizers import l2
 import tensorflow as tf
-from .inits import glorot
-
 
 class Sampling(Layer):
     """Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
@@ -46,34 +45,76 @@ class Decoder(Layer):
 
 
 class GraphConvolution(Layer):
-    def __init__(self, input_dim, output_dim, bias=False, featureless=False, dropout=0., activation=tf.keras.activations.relu, **kwargs):
-        super(GraphConvolution, self).__init__(**kwargs)
+    def __init__(self, adjacency, units, activation=tf.identity, dropout=0.0, l2=0.0, dtype=tf.float32, name=None):
+        """
+            Params:
+              Adjacency: a tf.SparseTensor adjacency matrix
+              Units: The number of output units per node state
+              Activation: The activation function to apply to the node states
+              Dropout: The amount of dropout (0.0 being none, 1.0 being all units) to apply
+              l2: The amount of L2 regularisation to apply
+              dtype: The type of values in the tensors this layer will transform
+              name: The name of this layer
+        """
+        super(GraphConvolution, self).__init__(dtype=dtype, name=name)
 
-        self.dropout = dropout
+        self.adjacency = adjacency
+        self.units = units
         self.activation = activation
-        self.bias = bias
-        self.featureless = featureless
+        self.dropout = dropout
+        self.l2 = l2
 
-        self.weights_ = glorot([input_dim, output_dim], name='weights')
-        if self.bias:
-            self.bias = self.add_weight(name='bias', shape=[output_dim])
+        assert isinstance(adjacency, tf.SparseTensor), "Adjacency matrix should be a SparseTensor"
+        assert adjacency.dtype == self.dtype, "Adjacency matrix not expected dtype, got " + str(
+            adjacency.dtype) + " expected " + str(self.dtype)
 
+    def build(self, input_shape):
+        """
+            This method is called during the initial compilation of our model. Its
+            primary job is to initialize the weights for this layer.
+
+            Params:
+              input_shape: this is the shape of the input to the layer, in our case an
+                           array of (NUMBER_NODES, INPUT_SIZE)
+
+            Build one weight, w, which will be applied to each input. Initialize
+            it from the uniform distribution, scaled by the size of the matrix. Apply
+            l2 loss to regularize the matrix
+        """
+        self.w = self.add_weight(shape=(input_shape[1], self.units), dtype=self.dtype,
+                                 initializer='glorot_uniform', regularizer=l2(self.l2))
 
     def call(self, inputs):
-        x, a = inputs
-        # x = tf.nn.dropout(x, self.dropout)
+        """
+            This method is called to apply the layer to an incoming tensor. This is the
+            real meat of the model.
 
-        # convolve
-        if not self.featureless:  # if it has features x
-            pre_h = tf.matmul(x, self.weights_)
-        else:
-            pre_h = self.weights_
-        output = tf.matmul(a, pre_h)
-        print(a.shape, x.shape, self.weights_.shape, pre_h.shape, output.shape)
+            Params:
+              node_state: The tf.Tensor of node states.  Shape (NUMBER_NODES, NODE_STATE_SIZE)
 
-        # bias
-        if self.bias:
-            output += self.bias
+            Returns: The transformed node state tf.Tensor
+        """
+        assert isinstance(inputs, tf.Tensor), "Layer input should be a Tensor, got " + str(type(inputs))
+        assert inputs.dtype == self.dtype, "Input to layer " + str(self.name) + " wrong dtype, got " + str(inputs.dtype) + " expected " + str(self.dtype)
+        tf.debugging.check_numerics(inputs, "Input to layer " + str(self.name) + " has numerical instability")
 
-        return self.activation(output)
+        # Dropout
+        inputs = tf.nn.dropout(inputs, rate=self.dropout)
+        # Apply the node convolution: This means to matrix: multiply each input by the learned parameters `self.w`
+        print(inputs.shape, self.w.shape)
+        inputs = tf.matmul(inputs, self.w)
+
+        # Apply the graph propagation: This means to multiply the
+        # normalized adjacency matrix by the inputs
+        # You can do this as a single sparse_dense_matmul()
+
+        print(self.adjacency.shape, inputs.shape)
+        inputs = tf.sparse.sparse_dense_matmul(self.adjacency, inputs)
+        print(inputs.shape)
+        print('===================')
+        output = self.activation(inputs)
+
+        tf.debugging.check_numerics(output, "Output of layer " + str(self.name) + " has numerical instability")
+
+        return output
 

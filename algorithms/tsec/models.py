@@ -33,30 +33,25 @@ class VariationalAutoEncoder(Model):
 
 class GCN(Model):
 
-    def __init__(self, original_dim, output_dim=32, num_labels=2, dropout=0., weight_decay=0., name="gcn", **kwargs):
+    def __init__(self, dimension=32, num_classes=2, dropout=0., weight_decay=0., adj=None, name="gcn", **kwargs):
         super(GCN, self).__init__(name=name, **kwargs)
-        self.original_dim = original_dim
+        self.dimension = dimension
         self.weight_decay = weight_decay
+        self.dropout = dropout
+        self.adj = adj
 
-        self.layers_ = []
-        self.layers_.append(GraphConvolution(original_dim, output_dim, dropout=dropout, activation=tf.keras.activations.relu, name='gc1'))
-        self.layers_.append(GraphConvolution(output_dim, num_labels, dropout=dropout, activation=tf.keras.activations.softmax, name='gc2'))
-
+        self.gc1 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout)
+        self.gc2 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout)
+        self.dense = Dense(units=num_classes, activation='softmax')
 
     def call(self, inputs):
-        x, a = inputs
-
-        outputs = [x]
-
-        for i, layer in enumerate(self.layers):
-            hidden = layer((outputs[-1], a))
-            outputs.append(hidden)
-
-        output = outputs[-1]
+        inputs = self.gc1(inputs)
+        inputs = self.gc2(inputs)
+        output = self.dense(inputs)
 
         # Weight decay loss
         loss = tf.zeros([])
-        for var in self.layers_[0].trainable_variables:
+        for var in self.layers[0].trainable_variables:
             loss += self.weight_decay * tf.nn.l2_loss(var)
 
         self.add_loss(loss)

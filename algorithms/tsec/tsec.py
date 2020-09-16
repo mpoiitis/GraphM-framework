@@ -12,6 +12,7 @@ from .models import VariationalAutoEncoder as VAE
 from .models import GCN
 import matplotlib.pyplot as plt
 import os
+from scipy.sparse import csr_matrix, coo_matrix
 
 
 
@@ -38,35 +39,61 @@ def tsec(args, G, features, y, node_dict):
     # Some preprocessing
     features = preprocess_features(features)
     if args.type == 'gcn':
-        support = preprocess_adj(A)
-        num_supports = 1
+        A = preprocess_adj(A)
     elif args.type == 'gcn_cheby':
-        support = chebyshev_polynomials(A, args.max_degree)
-        num_supports = 1 + args.max_degree
+        A = chebyshev_polynomials(A, args.max_degree)
     else:
         return
 
-    x = np.hstack((features, support))  # horizontally stack feature and adjacency matrix together to split them equally
+    # horizontally stack feature and adjacency matrix together to split them equally
+    x = np.hstack((features, A))
+
+    # turn labels from string into integers
     encoder = LabelEncoder()
     y_transformed = encoder.fit_transform(y)
-    num_labels = len(np.unique(y_transformed))
+    num_classes = len(np.unique(y_transformed))
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
-    es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=args.early_stopping)  # add early stopping
 
     if args.nn == 'autoencoder':
         X_train, X_test, y_train, y_test = train_test_split(x, y_transformed, test_size=0.33, random_state=42)
+
         model = VAE(X_train.shape[1], intermediate_dim=args.hidden_dim, latent_dim=args.dimension)
+
+        es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=args.early_stopping)  # add early stopping
         model.compile(optimizer=optimizer, loss=tf.keras.losses.MeanSquaredError())
+
         history = model.fit(X_train, X_train, epochs=args.iter, batch_size=args.batch_size, shuffle=True,
                             validation_split=0.33, callbacks=[es], verbose=1)
     else:
+        # each instance should contain a 1-hot vector for all the labels, instead of a single label
         y_transformed = to_categorical(y_transformed)
         X_train, X_test, y_train, y_test = train_test_split(x, y_transformed, test_size=0.33, random_state=42)
-        model = GCN(X_train[:, :features.shape[1]].shape[1], args.dimension, num_labels, args.dropout, args.weight_decay)
+
+        #split again into features and adjacency after train_test_split
+        A_train = X_train[:, features.shape[1]:]
+        X_train = X_train[:, :features.shape[1]]
+
+        A_test = X_test[:, features.shape[1]:]
+        X_test = X_test[:, :features.shape[1]]
+
+
+        A_train = csr_matrix(A_train)
+        coo = A_train.tocoo()
+        indices = np.array(list(zip(coo.row, coo.col)))
+        tf_adj = tf.SparseTensor(indices=indices, values=tf.cast(A_train.data, tf.float32), dense_shape=A_train.shape)
+
+        model = GCN(args.dimension, num_classes, args.dropout, args.weight_decay, tf_adj)
+
+        # Fix the random seeds prior to compiling and training the model - this helps make
+        # results reproduceable
+        np.random.seed(13)
+        tf.random.set_seed(13)
+        es = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=args.early_stopping)  # add early stopping
         model.compile(optimizer=optimizer, loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
-        history = model.fit((X_train[:, :features.shape[1]], X_train[:, features.shape[1]:]), y_train, epochs=args.iter, batch_size=args.batch_size, shuffle=True,
-                            validation_split=0.33, callbacks=[es], verbose=1)
+
+        history = model.fit(X_train, y_train, epochs=args.iter, batch_size=A_train.shape[0], shuffle=False, callbacks=[es], verbose=1)
+        # no batch processing, following the original paper. since the adjacency matrix is the whole graph, we want to feed the whole input array in each training step
 
     if not os.path.exists('output/models'):
         os.makedirs('output/models')
