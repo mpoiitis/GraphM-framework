@@ -90,10 +90,6 @@ def tsec(args, G, features, y, node_dict):
     if not os.path.exists('output/models'):
         os.makedirs('output/models')
 
-    if args.input != "cora" and args.input != "citeseer":
-        print('Only Cora and Citeseer datasets are supported!')
-        return
-
     # Set random seed
     seed = 123
     np.random.seed(seed)

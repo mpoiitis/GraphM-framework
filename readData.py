@@ -7,6 +7,24 @@ from time import time
 from scipy.io import loadmat
 
 
+def produce_node_dict(G, x):
+    """
+    Maps node names to integer codes
+    :param G: the initial graph
+    :param x: the initial feature matrix
+    :return: adjusted graph, adjusted feature matrix, node mapping dictionary
+    """
+
+    # map node names to int indices
+    node_dict = dict()
+    for i, n in enumerate(G.nodes()):
+        node_dict.update({str(n): i})
+    G = nx.relabel_nodes(G, node_dict)  # replace values in G
+    x.iloc[:, 0] = x.iloc[:, 0].astype(str)
+    x.iloc[:, 0].replace(node_dict, inplace=True)  # replace values in x
+    return G, x, node_dict
+
+
 def load_edgelist(file, directed=False, weighted=False):
     """
     Load graph from edge list
@@ -94,6 +112,9 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     else:
         raise Exception("Dense matrices not yet supported.")
 
+    # map node names to int indices
+    G, x, node_dict = produce_node_dict(G, x)
+
     for edge in G.edges():
         G[edge[0]][edge[1]]['weight'] = 1
 
@@ -103,7 +124,7 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     t1 = time()
     print('Graph loaded in {}s'.format(t1 - t0))
 
-    return G, x, y
+    return G, x, y, node_dict
 
 
 def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citeseer.content', directed=True):
@@ -126,11 +147,7 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
     y = df.iloc[:, -1]  # labels are stored in df's last column
 
     # map node names to int indices
-    node_dict = dict()
-    for i, n in enumerate(G.nodes()):
-        node_dict.update({str(n):i})
-    G = nx.relabel_nodes(G, node_dict)  # replace values in G
-    x.iloc[:, 0].replace(node_dict, inplace=True)  # replace values in x
+    G, x, node_dict = produce_node_dict(G, x)
 
     # create all-zero rows for nodes that are not contained in the feature set
     if x.shape[0] != len(G.nodes):
@@ -178,7 +195,10 @@ def load_facebook(file, directory, directed=False):
     x = user_df.drop(54, axis=1)
     y = user_df[54]
 
-    return G, x, y
+    # map node names to int indices
+    G, x, node_dict = produce_node_dict(G, x)
+
+    return G, x, y, node_dict
 
 
 def load_graph(args):
@@ -198,19 +218,19 @@ def load_graph(args):
     elif args.input == "gnutella":
         G = load_gnutella('data/p2p-Gnutella08.edgelist', directed=args.directed, weighted=args.weighted)
     elif args.input == 'amherst':
-        G, x, y = load_matfile('data/Amherst41.mat', directed=args.directed)
+        G, x, y, node_dict = load_matfile('data/Amherst41.mat', directed=args.directed)
     elif args.input == 'hamilton':
-        G, x, y = load_matfile('data/Hamilton46.mat', directed=args.directed)
+        G, x, y, node_dict = load_matfile('data/Hamilton46.mat', directed=args.directed)
     elif args.input == 'mich':
-        G, x, y = load_matfile('data/Mich67.mat', directed=args.directed)
+        G, x, y, node_dict = load_matfile('data/Mich67.mat', directed=args.directed)
     elif args.input == 'rochester':
-        G, x, y = load_matfile('data/Rochester38.mat', directed=args.directed)
+        G, x, y, node_dict = load_matfile('data/Rochester38.mat', directed=args.directed)
     elif args.input == 'cora':
         G, x, y, node_dict = load_citeseer_cora('data/cora.cites', 'data/cora.content', directed=args.directed)
     elif args.input == 'citeseer':
         G, x, y, node_dict = load_citeseer_cora('data/citeseer.cites', 'data/citeseer.content', directed=args.directed)
     elif args.input == 'facebook':
-        G, x, y = load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
+        G, x, y, node_dict = load_facebook('data/facebook_combined.txt', 'data/facebook', directed=args.directed)
     else:
         raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist'" % args.format)
 
