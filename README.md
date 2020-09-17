@@ -115,6 +115,27 @@ TADW[[10]](#10) learns an embedding of nodes and fuses the node representations 
 **Example Usage**
     ``$python main.py --input karate --output output/karate.embeddings tadw --features dense --iter 50 --dimension 128 --lambd 500 --alpha 1000 --order 1 ``
 
+## Temporal Self-Supervised Embedding for Clustering (TSEC)
+
+### Usage
+
+**Parameters**
+
+- iter: Number of iterations for SGD. Default: 200
+- dimension: Number of latent dimensions to learn for each node. Default: 128
+- nn: The type of neural network. Default: 'gcn'
+- type: The type of the adjacency matrix. Default: 'gcn'
+- hidden-dim: The dimension of the latent layer. Currently used only on Variational Autoencoder method. Default: 512
+- batch-size: Size of batch for the SGD. Default: 128
+- max-degree: Maximum Chebyshev polynomial degree. Default: 3
+- learning-rate: Initial learning rate. Default: 0.001
+- dropout: Dropout rate (1 - keep probability). Default: 0.5
+- weight-decay: Weight for L2 loss on embedding matrix. E.g. 0.008. Default: 0.0
+- early-stopping: Tolerance for early stopping (# of epochs). E.g. 10. Default: None
+
+**Example Usage**
+    ``$python main.py --input karate --output output/karate.embeddings tsec --nn gcn --iter 50 --dimension 128 --batch-size 100 --learning-rate 0.01 --early-stopping 10 ``
+
 
 # Benchmark Datasets
 - Karate [[3]](#3)

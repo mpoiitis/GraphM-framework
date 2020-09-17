@@ -139,8 +139,8 @@ def load_citeseer_cora(citesFile='data/citeseer.cites', contentFile='data/citese
         for i, r in x.iterrows():
            new_x[r.iloc[0], :] = r
            new_y[r.iloc[0]] = y.iloc[i]
-        x = new_x
-        y = new_y
+        x = pd.DataFrame(new_x)
+        y = pd.DataFrame(new_y)
 
     for edge in G.edges():
         G[edge[0]][edge[1]]['weight'] = 1
