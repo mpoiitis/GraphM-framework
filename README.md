@@ -8,6 +8,7 @@ A framework for network embeddings for the task of Network Representation Learni
 - M-NMF [[8]](#8)
 - LINE [[9]](#9)
 - TADW [[10]](#10)
+- TSEC
 
 ## Generic Parameters
 - input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
