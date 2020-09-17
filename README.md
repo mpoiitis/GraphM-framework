@@ -117,7 +117,7 @@ TADW[[10]](#10) learns an embedding of nodes and fuses the node representations 
 
 ## Temporal Self-Supervised Embedding for Clustering (TSEC)
 
-TSEC can be applied on the Cora and Citeseer datasets for the time being. By exploiting either Graph Convolutional Neural Networks or Variational Autoencoders it will be trained through self-supervision to learn embeddings fine-tuned towards clustering.
+TSEC can be applied on every dataset for which there is available feature information. By exploiting either Graph Convolutional Neural Networks or Variational Autoencoders it will be trained through self-supervision to learn embeddings fine-tuned towards clustering.
 
 ### Usage
 
