@@ -1,6 +1,19 @@
 # GraphM-framework
 A framework for network embeddings for the task of Network Representation Learning
 
+# Generic Parameters
+
+- mode: 'embedding' or 'evaluation'. Specifies whether to run an embedding generation algorithm or an embedding evaluation method.
+
+## Embedding generation process (mode 'embedding')
+
+**Parameters**
+
+- input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
+- output: Output representation file path. Suggested: "output/name_of_the_embedding". Required
+- weighted  : Boolean specifying (un)weighted. Default: False
+- directed: Graph is (un)directed. Default: False
+
 ## Implemented Algorithms
 
 - DeepWalk [[1]](#1)
@@ -10,11 +23,6 @@ A framework for network embeddings for the task of Network Representation Learni
 - TADW [[10]](#10)
 - TSEC
 
-## Generic Parameters
-- input: Input graph dataset. Options: ['karate', 'nutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']. Required
-- output: Output representation file path. Suggested: "output/name_of_the_embedding". Required
-- weighted  : Boolean specifying (un)weighted. Default: False
-- directed: Graph is (un)directed. Default: False
 
 ## DeepWalk
 
@@ -32,7 +40,7 @@ DeepWalk[[1]](#1) uses short random walks alongside Word2Vec to learn representa
 - workers: Number of parallel processes. Default: 1
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings deepwalk --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
+    ``$python main.py embedding --input karate --output output/karate.embeddings deepwalk --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
 
 The parameters specified here are the same as in the paper.
 
@@ -53,7 +61,7 @@ Node2Vec[[2]](#2) extends DeepWalk by introducing parameters p and q to allow BF
 - workers: Number of parallel processes. Default: 1
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings node2vec --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
+    ``$python main.py embedding --input karate --output output/karate.embeddings node2vec --num-walks 80 --dimension 128 --walk-length 40 --window-size 10 --workers 1 ``
 
 The parameters specified here are the same as in the paper.
 
@@ -75,7 +83,7 @@ M-NMF[[8]](#8) incorporates the community structure into network embedding. Addi
 - lower-control: Lowest possible component value. Default: 10 ** -15
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings mnmf --dimension 80 --cluster 10 --lambd 0.1 --alpha 0.1 --beta 0.1 --eta 3.0 --iter 100 ``
+    ``$python main.py embedding --input karate --output output/karate.embeddings mnmf --dimension 80 --cluster 10 --lambd 0.1 --alpha 0.1 --beta 0.1 --eta 3.0 --iter 100 ``
 
 The parameters specified here are the same as in the paper.
 
@@ -93,7 +101,7 @@ LINE[[9]](#9) is able to embed very large-scale information networks. It is suit
 - negative-ratio: Parameter for negative sampling. Default: 5
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings line --dimension 80 --iter 100  --batch-size 300 --negative-sampling non-uniform --negative-ratio 2``
+    ``$python main.py embedding --input karate --output output/karate.embeddings line --dimension 80 --iter 100  --batch-size 300 --negative-sampling non-uniform --negative-ratio 2``
 
 The parameters specified here are the same as in the paper.
 
@@ -114,7 +122,7 @@ TADW[[10]](#10) learns an embedding of nodes and fuses the node representations 
 - lower-control: Overflow control. Default: 10**-15
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings tadw --features dense --iter 50 --dimension 128 --lambd 500 --alpha 1000 --order 1 ``
+    ``$python main.py embedding --input karate --output output/karate.embeddings tadw --features dense --iter 50 --dimension 128 --lambd 500 --alpha 1000 --order 1 ``
 
 ## Temporal Self-Supervised Embedding for Clustering (TSEC)
 
@@ -137,8 +145,13 @@ TSEC can be applied on every dataset for which there is available feature inform
 - early-stopping: Tolerance for early stopping (# of epochs). E.g. 10. Default: None
 
 **Example Usage**
-    ``$python main.py --input karate --output output/karate.embeddings tsec --nn gcn --iter 50 --dimension 128 --batch-size 100 --learning-rate 0.01 --early-stopping 10 ``
+    ``$python main.py embedding --input cora --output output/cora.embeddings tsec --nn gcn --iter 50 --dimension 128 --batch-size 100 --learning-rate 0.01 --early-stopping 10 ``
 
+## Embedding evaluation process (mode 'evaluation')
+
+**Parameters**
+
+- input: the file of the embedding to evaluate.
 
 # Benchmark Datasets
 - Karate [[3]](#3)
