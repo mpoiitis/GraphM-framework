@@ -67,13 +67,13 @@ def parse_args():
     tsec_parser.add_argument("--hidden-dim", default=512, type=int, help="Number of units in the hidden layers. Default is 512")
     tsec_parser.add_argument("--batch-size", default=128, type=int, help="Size of the batch used for training. Default is 128")
     tsec_parser.add_argument("--max-degree", default=3, type=int, help="Maximum Chebyshev polynomial degree. Default is 3")
-    tsec_parser.add_argument("--learning-rate", default=0.01, type=float, help="Initial learning rate. Default is 0.01")
+    tsec_parser.add_argument("--learning-rate", default=0.001, type=float, help="Initial learning rate. Default is 0.001")
     tsec_parser.add_argument("--dropout", default=0.5, type=float, help="Dropout rate (1 - keep probability). Default is 0.5")
-    tsec_parser.add_argument("--weight-decay", default=0.0008, type=float, help="Weight for L2 loss on embedding matrix. Default is 0.0008")
-    tsec_parser.add_argument("--early-stopping", default=10, type=int, help="Tolerance for early stopping (# of epochs). Default is 10")
+    tsec_parser.add_argument("--weight-decay", default=0.0, type=float, help="Weight for L2 loss on embedding matrix. E.g. 0.008. Default is 0.0")
+    tsec_parser.add_argument("--early-stopping", default=None, type=int, help="Tolerance for early stopping (# of epochs). E.g. 10. Default is None")
 
-    parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer'],
-                        help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer']")
+    parser.add_argument('--input', required=True, choices=['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer', 'pubmed'],
+                        help="Input graph dataset. Options: ['karate', 'gnutella', 'amherst', 'hamilton', 'mich', 'rochester', 'facebook', 'cora', 'citeseer', 'pubmed']")
     parser.add_argument('--output', required=True, help='Output representation file path')
     parser.add_argument('--weighted', default=False, type=bool, help='Boolean specifying (un)weighted. Default is False.')
     parser.add_argument('--directed', default=False, type=bool, help='Graph is (un)directed. Default is False.')
@@ -85,6 +85,7 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+
     G, x, y, node_dict = load_graph(args)
 
     if args.method == 'deepwalk':

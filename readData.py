@@ -1,10 +1,10 @@
-from time import time
+import os
 import networkx as nx
 import pandas as pd
-from scipy.io import loadmat
-from scipy.sparse import issparse
-import os
 import numpy as np
+import scipy.sparse as sp
+from time import time
+from scipy.io import loadmat
 
 
 def load_edgelist(file, directed=False, weighted=False):
@@ -87,7 +87,7 @@ def load_matfile(file='data/Amherst41.mat', directed=False):
     y = df[5]
 
     G = nx.DiGraph(weight=1)
-    if issparse(mat_matrix):
+    if sp.issparse(mat_matrix):
         cx = mat_matrix.tocoo()
         for i, j, v in zip(cx.row, cx.col, cx.data):
             G.add_edge(i, j, weight=v)

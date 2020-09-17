@@ -40,8 +40,8 @@ class GCN(Model):
         self.dropout = dropout
         self.adj = adj
 
-        self.gc1 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout)
-        self.gc2 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout)
+        self.gc1 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout, l2=self.weight_decay, name='gc1')
+        self.gc2 = GraphConvolution(self.adj, units=self.dimension, activation=tf.keras.backend.relu, dropout=self.dropout, l2=self.weight_decay, name='gc2')
         self.dense = Dense(units=num_classes, activation='softmax')
 
     def call(self, inputs):
@@ -49,10 +49,4 @@ class GCN(Model):
         inputs = self.gc2(inputs)
         output = self.dense(inputs)
 
-        # Weight decay loss
-        loss = tf.zeros([])
-        for var in self.layers[0].trainable_variables:
-            loss += self.weight_decay * tf.nn.l2_loss(var)
-
-        self.add_loss(loss)
         return output

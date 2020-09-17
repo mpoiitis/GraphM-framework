@@ -45,7 +45,7 @@ class Decoder(Layer):
 
 
 class GraphConvolution(Layer):
-    def __init__(self, adjacency, units, activation=tf.identity, dropout=0.0, l2=0.0, dtype=tf.float32, name=None):
+    def __init__(self, adjacency, units, activation=tf.identity, dropout=0.0, l2=0.0, dtype=tf.float32, name='GraphConvolution'):
         """
             Params:
               Adjacency: a tf.SparseTensor adjacency matrix
@@ -64,9 +64,6 @@ class GraphConvolution(Layer):
         self.dropout = dropout
         self.l2 = l2
 
-        assert isinstance(adjacency, tf.SparseTensor), "Adjacency matrix should be a SparseTensor"
-        assert adjacency.dtype == self.dtype, "Adjacency matrix not expected dtype, got " + str(
-            adjacency.dtype) + " expected " + str(self.dtype)
 
     def build(self, input_shape):
         """
@@ -82,7 +79,7 @@ class GraphConvolution(Layer):
             l2 loss to regularize the matrix
         """
         self.w = self.add_weight(shape=(input_shape[1], self.units), dtype=self.dtype,
-                                 initializer='glorot_uniform', regularizer=l2(self.l2))
+                                 initializer='glorot_uniform', regularizer=l2(self.l2), name='weight')
 
     def call(self, inputs):
         """
@@ -94,27 +91,15 @@ class GraphConvolution(Layer):
 
             Returns: The transformed node state tf.Tensor
         """
-        assert isinstance(inputs, tf.Tensor), "Layer input should be a Tensor, got " + str(type(inputs))
-        assert inputs.dtype == self.dtype, "Input to layer " + str(self.name) + " wrong dtype, got " + str(inputs.dtype) + " expected " + str(self.dtype)
-        tf.debugging.check_numerics(inputs, "Input to layer " + str(self.name) + " has numerical instability")
 
         # Dropout
         inputs = tf.nn.dropout(inputs, rate=self.dropout)
-        # Apply the node convolution: This means to matrix: multiply each input by the learned parameters `self.w`
-        print(inputs.shape, self.w.shape)
+        # Convolution
         inputs = tf.matmul(inputs, self.w)
-
-        # Apply the graph propagation: This means to multiply the
-        # normalized adjacency matrix by the inputs
-        # You can do this as a single sparse_dense_matmul()
-
-        print(self.adjacency.shape, inputs.shape)
+        # Propagation
         inputs = tf.sparse.sparse_dense_matmul(self.adjacency, inputs)
-        print(inputs.shape)
-        print('===================')
-        output = self.activation(inputs)
 
-        tf.debugging.check_numerics(output, "Output of layer " + str(self.name) + " has numerical instability")
+        output = self.activation(inputs)
 
         return output
 
