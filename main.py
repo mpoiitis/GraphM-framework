@@ -82,6 +82,9 @@ def parse_args():
 
     evaluation_parser = subparsers.add_parser('evaluation', help="Runs an evaluation algorithm to test the produced embeddings.")
     evaluation_parser.add_argument('--input', required=True, help='The embedding file.')
+    evaluation_parser.add_argument('--ground-truth-input', required=True, help='Path of file containing ground truth')
+    evaluation_parser.add_argument('--normalize', default=False, type=bool, help='If True then data will be normalized. Default is False.')
+    evaluation_parser.add_argument('--k', default=5, type=int, help='Number of clusters')
     args = parser.parse_args()
 
     return args
@@ -110,4 +113,4 @@ if __name__ == "__main__":
         else:
             pass
     else: # evaluation
-        evaluation(args.input)
+        evaluation(args)
