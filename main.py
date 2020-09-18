@@ -6,7 +6,7 @@ from algorithms.line.line import line
 from algorithms.tadw.tadw_main import tadw
 from algorithms.tsec.tsec import tsec
 from readData import load_graph
-
+from evaluation.evaluation import evaluation
 
 def parse_args():
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter, conflict_handler='resolve')
@@ -89,23 +89,25 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+    if args.mode == 'embedding':
+        G, x, y, node_dict = load_graph(args)
 
-    G, x, y, node_dict = load_graph(args)
-
-    if args.method == 'deepwalk':
-        deepWalk(args, G)
-    elif args.method == 'node2vec':
-        node2vec(args, G)
-    elif args.method == 'mnmf':
-        mNMF(args, G)
-    elif args.method == 'line':
-        line(args, G)
-    elif args.method == 'tadw':
-        if not x:
-            print('Node features are required to run TADW.')
+        if args.method == 'deepwalk':
+            deepWalk(args, G)
+        elif args.method == 'node2vec':
+            node2vec(args, G)
+        elif args.method == 'mnmf':
+            mNMF(args, G)
+        elif args.method == 'line':
+            line(args, G)
+        elif args.method == 'tadw':
+            if not x:
+                print('Node features are required to run TADW.')
+            else:
+                tadw(args, G, x)
+        elif args.method == 'tsec':
+            tsec(args, G, x, y, node_dict)
         else:
-            tadw(args, G, x)
-    elif args.method == 'tsec':
-        tsec(args, G, x, y, node_dict)
-    else:
-        pass
+            pass
+    else: # evaluation
+        evaluation(args.input)
