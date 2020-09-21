@@ -81,9 +81,10 @@ def parse_args():
     tsec_parser.add_argument("--early-stopping", default=None, type=int, help="Tolerance for early stopping (# of epochs). E.g. 10. Default is None.")
 
     evaluation_parser = subparsers.add_parser('evaluation', help="Runs an evaluation algorithm to test the produced embeddings.")
+    evaluation_parser.add_argument('--no-embedding', dest='no_embedding', action='store_true', help='If given, the evaluation will be done using the initial feature matrix')
     evaluation_parser.add_argument('--input', required=True, help='The embedding file.')
     evaluation_parser.add_argument('--ground-truth-input', required=True, help='Path of file containing ground truth')
-    evaluation_parser.add_argument('--normalize', default=False, type=bool, help='If True then data will be normalized. Default is False.')
+    evaluation_parser.add_argument('--normalize', dest='normalize', action='store_true', help='If given, data will be normalized')
     evaluation_parser.add_argument('--k', default=5, type=int, help='Number of clusters')
     args = parser.parse_args()
 
@@ -112,5 +113,5 @@ if __name__ == "__main__":
             tsec(args, G, x, y, node_dict)
         else:
             pass
-    else: # evaluation
+    else:  # evaluation
         evaluation(args)

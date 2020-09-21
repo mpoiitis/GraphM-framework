@@ -3,16 +3,28 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import silhouette_score, f1_score
 
+
 def evaluation(args):
-    data = pd.read_csv(args.input)
-    gt = pd.read_csv(args.ground_truth_input, sep="\t", header=None)
-    labels = gt.iloc[:, -1]
-    # turn labels from string into integers
-    encoder = LabelEncoder()
-    labels = encoder.fit_transform(labels)
-    ids = data.iloc[:, 0]
-    column_names = list(data.columns)
-    data = data.drop(['id'], axis=1)
+    if args.no_embedding is True:
+        data = pd.read_csv(args.ground_truth_input, sep="\t", header=None)
+        labels = data.iloc[:, -1]
+
+        # turn labels from string into integers
+        encoder = LabelEncoder()
+        labels = encoder.fit_transform(labels)
+
+        column_names = list(data.columns)
+        data = data.iloc[:, 1:-1]  # drop ids and labels
+    else:
+        data = pd.read_csv(args.input)
+        gt = pd.read_csv(args.ground_truth_input, sep="\t", header=None)
+        labels = gt.iloc[:, -1]
+        # turn labels from string into integers
+        encoder = LabelEncoder()
+        labels = encoder.fit_transform(labels)
+
+        column_names = list(data.columns)
+        data = data.drop(['id'], axis=1)
 
     if args.normalize:
         scaler = StandardScaler()
