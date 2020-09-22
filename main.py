@@ -5,6 +5,7 @@ from algorithms.mnmf.mnmf import mNMF
 from algorithms.line.line import line
 from algorithms.tadw.tadw_main import tadw
 from algorithms.tsec.tsec import tsec
+from algorithms.dgi.dgi import dgi
 from readData import load_graph
 from evaluation.evaluation import evaluation
 
@@ -80,6 +81,16 @@ def parse_args():
     tsec_parser.add_argument("--weight-decay", default=0.0, type=float, help="Weight for L2 loss on embedding matrix. E.g. 0.008. Default is 0.0.")
     tsec_parser.add_argument("--early-stopping", default=None, type=int, help="Tolerance for early stopping (# of epochs). E.g. 10. Default is None.")
 
+    dgi_parser = embedding_subparsers.add_parser('dgi', help='DGI method.')
+    dgi_parser.add_argument("--iter", default=200, type=int, help="Number of iterations for SGD. Default is 200.")
+    dgi_parser.add_argument("--dimension", default=512, type=int,  help="Number of latent dimensions to learn for each node. Default is 512.")
+    dgi_parser.add_argument("--batch-size", default=1, type=int, help="Size of the batch used for training. Default is 1.")
+    dgi_parser.add_argument("--learning-rate", default=0.001, type=float, help="Initial learning rate. Default is 0.001.")
+    dgi_parser.add_argument("--dropout", default=0.0, type=float, help="Dropout rate (1 - keep probability). Default is 0.0.")
+    dgi_parser.add_argument("--weight-decay", default=0.0, type=float, help="Weight for L2 loss on embedding matrix. E.g. 0.008. Default is 0.0.")
+    dgi_parser.add_argument("--early-stopping", default=20, type=int, help="Tolerance for early stopping (# of epochs). E.g. 10. Default is 20.")
+    dgi_parser.add_argument("--sparse", dest='sparse', action='store_true', help="Use sparse form of arrays")
+
     evaluation_parser = subparsers.add_parser('evaluation', help="Runs an evaluation algorithm to test the produced embeddings.")
     evaluation_parser.add_argument('--no-embedding', dest='no_embedding', action='store_true', help='If given, the evaluation will be done using the initial feature matrix')
     evaluation_parser.add_argument('--input', required=True, help='The embedding file.')
@@ -111,6 +122,8 @@ if __name__ == "__main__":
                 tadw(args, G, x)
         elif args.method == 'tsec':
             tsec(args, G, x, y, node_dict)
+        elif args.method == 'dgi':
+            dgi(args, G, x, y, node_dict)
         else:
             pass
     else:  # evaluation

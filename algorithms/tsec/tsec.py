@@ -1,6 +1,7 @@
 import tensorflow as tf
 import networkx as nx
-from .utils import *
+import numpy as np
+from utils import preprocess_adj, preprocess_features, chebyshev_polynomials, preprocess_data
 from tensorflow.keras import Model
 from .metrics import AccuracyByClass
 from sklearn.preprocessing import LabelEncoder

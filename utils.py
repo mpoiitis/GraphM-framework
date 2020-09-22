@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+import torch
 import scipy.sparse as sp
 from scipy.sparse.linalg.eigen.arpack import eigsh
 from sklearn.model_selection import train_test_split
@@ -66,21 +66,8 @@ def sample_mask(idx, l):
 
 
 def preprocess_data(features, y):
-    # each instance should contain a 1-hot vector for all the labels, instead of a single label
-    enc = OneHotEncoder(handle_unknown='ignore')
-    y = enc.fit_transform(y.to_numpy().reshape(-1, 1))
-    y = y.todense()
 
-    features = features.iloc[:, 1:]  # remove ids
-    X_train, X_test, y_train, y_test = train_test_split(features, y, test_size=0.33, random_state=42)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.33, random_state=42)  # validation set
-
-    train_idx_reorder = list(X_train.index)  # get indices of train set
-    idx_train = np.sort(train_idx_reorder).tolist()  # sort indices
-    test_idx_reorder = list(X_test.index)
-    idx_test = np.sort(test_idx_reorder).tolist()
-    val_idx_reorder = list(X_val.index)
-    idx_val = np.sort(val_idx_reorder).tolist()
+    features, y, idx_train, idx_val, idx_test = preprocess_data_trunc(features, y)
 
     features = sp.lil_matrix(features.to_numpy())
     labels = y
@@ -98,3 +85,35 @@ def preprocess_data(features, y):
     y_test[test_mask, :] = labels[test_mask, :]
 
     return features, y_train, y_val, y_test, train_mask, val_mask, test_mask
+
+
+def preprocess_data_trunc(features, y):
+    """
+    Truncated version of preprocess_data
+    """
+    # each instance should contain a 1-hot vector for all the labels, instead of a single label
+    enc = OneHotEncoder(handle_unknown='ignore')
+    y = enc.fit_transform(y.to_numpy().reshape(-1, 1))
+    y = y.todense()
+
+    features = features.iloc[:, 1:]  # remove ids
+    X_train, X_test, y_train, y_test = train_test_split(features, y, test_size=0.33, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.33,
+                                                      random_state=42)  # validation set
+
+    train_idx_reorder = list(X_train.index)  # get indices of train set
+    idx_train = np.sort(train_idx_reorder).tolist()  # sort indices
+    test_idx_reorder = list(X_test.index)
+    idx_test = np.sort(test_idx_reorder).tolist()
+    val_idx_reorder = list(X_val.index)
+    idx_val = np.sort(val_idx_reorder).tolist()
+
+    return features, y, idx_train, idx_val, idx_test
+
+def sparse_mx_to_torch_sparse_tensor(sparse_mx):
+    """Convert a scipy sparse matrix to a torch sparse tensor."""
+    sparse_mx = sparse_mx.tocoo().astype(np.float32)
+    indices = torch.from_numpy(np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
+    values = torch.from_numpy(sparse_mx.data)
+    shape = torch.Size(sparse_mx.shape)
+    return torch.sparse.FloatTensor(indices, values, shape)
