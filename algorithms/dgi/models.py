@@ -14,14 +14,14 @@ class DGI(nn.Module):
         self.disc = Discriminator(n_h)
 
     def forward(self, seq1, seq2, adj, sparse, msk, samp_bias1, samp_bias2):
-        h_1 = self.gcn(seq1, adj, sparse)
+        h = self.gcn(seq1, adj, sparse)  # the proper h
 
-        c = self.read(h_1, msk)
-        c = self.sigm(c)
+        s = self.read(h, msk)  # the summary vectors produced by readout
+        s = self.sigm(s)
 
-        h_2 = self.gcn(seq2, adj, sparse)
+        h_corrupted = self.gcn(seq2, adj, sparse)  # the corrupted h
 
-        ret = self.disc(c, h_1, h_2, samp_bias1, samp_bias2)
+        ret = self.disc(s, h, h_corrupted, samp_bias1, samp_bias2)
 
         return ret
 

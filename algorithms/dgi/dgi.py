@@ -62,7 +62,6 @@ def dgi(args, G, features, y, node_dict):
         idx_test = idx_test.cuda()
 
     b_xent = nn.BCEWithLogitsLoss()
-    xent = nn.CrossEntropyLoss()
     cnt_wait = 0
     best = 1e9
     best_t = 0
@@ -73,8 +72,10 @@ def dgi(args, G, features, y, node_dict):
         model.train()
         optimiser.zero_grad()
 
+        # row-wise shuffling of feature matrix only to obtain corrupted inputs
         idx = np.random.permutation(num_nodes)
         shuf_fts = features[:, idx, :]
+
         lbl_1 = torch.ones(args.batch_size, num_nodes)
         lbl_2 = torch.zeros(args.batch_size, num_nodes)
         lbl = torch.cat((lbl_1, lbl_2), 1)
@@ -83,7 +84,7 @@ def dgi(args, G, features, y, node_dict):
             shuf_fts = shuf_fts.cuda()
             lbl = lbl.cuda()
 
-        logits = model(features, shuf_fts, A if args.sparse else A, args.sparse, None, None, None)
+        logits = model(features, shuf_fts, A, args.sparse, None, None, None)
         loss = b_xent(logits, lbl)
         print('Loss:', loss)
 
@@ -106,7 +107,7 @@ def dgi(args, G, features, y, node_dict):
     print('Loading {}th epoch'.format(best_t))
     model.load_state_dict(torch.load('best_dgi.pkl'))
 
-    embeds, _ = model.embed(features, A if args.sparse else A, args.sparse, None)
+    embeds, _ = model.embed(features, A, args.sparse, None)
     train_embs = embeds[0, idx_train]
     val_embs = embeds[0, idx_val]
     test_embs = embeds[0, idx_test]
@@ -119,7 +120,7 @@ def dgi(args, G, features, y, node_dict):
     tot = tot.cuda()
 
     accs = []
-
+    xent = nn.CrossEntropyLoss()
     for _ in range(50):
         log = LogReg(args.dimension, num_classes)
         opt = torch.optim.Adam(log.parameters(), lr=0.01, weight_decay=0.0)
